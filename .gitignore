@@ -1,3 +1,5 @@
 wiki_crop/
 .vscode/
 venv/
+__pycache__/
+*.mat

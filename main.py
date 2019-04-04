@@ -3,7 +3,7 @@ import tensorflow.keras as keras
 from pathlib import Path as path
 import os
 
-tf.enable_eager_execution()
+# tf.enable_eager_execution()
 print(tf.__version__, keras.__version__)
 root = os.getcwd()
 root += '\\wiki_crop\\00'
@@ -34,5 +34,12 @@ a = []
 img_raw = tf.read_file(test_str)
 print(repr(img_raw)[:100]+"...")
 
+with tf.Session() as sess:
+    print(repr(sess.run(img_raw))[:100]+"...")
+
 # image_generator = keras.preprocessinsg.image.ImageDataGenerator(rescale=1/255)
 # image_data = image_generator.flow_from_directory('wiki_crop')
+
+import mat
+
+a = 0
