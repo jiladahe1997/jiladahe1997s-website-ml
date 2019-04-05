@@ -1,4 +1,6 @@
 from main_eager import image_label_ds as ds
+from main_eager import image_label_ds_test as ds_test
+
 import tensorflow as tf
 
 '''
@@ -7,9 +9,13 @@ import tensorflow as tf
 '''
 ds = ds.apply(
   tf.data.experimental.shuffle_and_repeat(buffer_size=600))
-ds = ds.batch(32)
+ds = ds.batch(20)
 ds = ds.prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
 
+ds_test = ds_test.apply(
+  tf.data.experimental.shuffle_and_repeat(buffer_size=600))
+ds_test = ds_test.batch(32)
+ds_test = ds_test.prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
 
 '''
   # * 第二步：数据[0-1]转换到[-1,1]
@@ -46,5 +52,14 @@ model.summary()
   # todo 保存模型，修改steps_per_epoch
   # todo 增加可视化
 '''
-model.fit(ds, epochs=3, steps_per_epoch=3)
+model.fit(ds, epochs=100, steps_per_epoch=20)
 a=0
+
+'''
+  # * 第五步：作出预测
+'''
+import numpy as np
+prediction = model.evaluate_generator(ds_test, steps=3)
+np.argmax(prediction[0])
+
+a=[]
