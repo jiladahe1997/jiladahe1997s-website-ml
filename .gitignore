@@ -3,3 +3,5 @@ wiki_crop/
 venv/
 __pycache__/
 *.mat
+pandas/
+*.h5

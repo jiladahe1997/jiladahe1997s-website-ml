@@ -15,11 +15,27 @@ tf.enable_eager_execution()
 # image_root = [str(i) for i in image_root]
 
 root = os.getcwd()
-root += '\\wiki_crop\\00'
+# root00 = root+'\\wiki_crop\\00'
+root = root+'\\wiki_crop\\'
+
+
 img_path = []
 for root, dirs, files in os.walk(root):
-    for files_name in files:
-        img_path.append(root+'\\'+files_name)
+  for directory in dirs:
+    directory = root+directory+'\\'
+    for files_name in os.walk(directory):
+      for file_name in files_name[2]:
+        img_path.append(directory+file_name)
+img_path = img_path[:2400]
+# for i in range(99):
+#   if i<10:
+#     root_directory = root+'0'+str(i)
+#   else:
+#     root_directory = root+str(i)
+#   for root, dirs, files in os.walk(root_directory):
+#     for files_name in files:
+#       img_path.append(root+root_directory+files_name)
+
 
 root_test = os.getcwd()
 root_test += '\\wiki_crop\\00'
@@ -38,12 +54,13 @@ def decode_img(path):
     img_tensor = tf.io.decode_image(img_raw, channels=3)
     img_resize = tf.image.resize_images(img_tensor, [192, 192])
     # print(repr(img_raw)[:100]+"...")
+    img_resize = tf.cast(img_resize, tf.float32)
     img_resize /= 255.0
     return img_resize
 
 img_tensors = []
-for i in img_path:
-    img_tensors.append(decode_img(i))
+# for i in img_path:
+#     img_tensors.append(decode_img(i))
 
 img_tensors_test = []
 for i in img_path_test:
@@ -73,12 +90,17 @@ import matplotlib.pyplot as plt
 import mat
 # 组合img_dataset和mat
 # 1.根据img_path重新排mat中age顺序
+for age in mat.age:
+  if(age.get('filename') == '7721992_1947-10-06_1964.jpg'):
+    print('debug!')
 age_dataset=[]
+img_dataset=[]
 for file_path in img_path:
     file_path_sliced = file_path[51:]
     for age in mat.age:
         if age.get('filename') == file_path_sliced:
             age_dataset.append(int(age.get('age')))
+            img_dataset.append(decode_img(file_path))
 
 age_dataset_test = []
 for file_path in img_path_test:
@@ -97,9 +119,11 @@ for file_path in img_path_test:
 # * 第四步：数据转为dataset,并取前n张（多了爆内存死机）
 # todo 是否可以不转为dataset？直接训练
 '''
-img_tensors = img_tensors[:600]
-img_dataset = tf.data.Dataset.from_tensor_slices(img_tensors)
-age_dataset = age_dataset[:600]
+img_dataset = img_dataset[:3000]
+print("图片数:",len(img_dataset))
+img_dataset = tf.data.Dataset.from_tensor_slices(img_dataset)
+age_dataset = age_dataset[:3000]
+print("标签数:",len(age_dataset))
 age_dataset = tf.data.Dataset.from_tensor_slices(age_dataset)
 image_label_ds = tf.data.Dataset.zip((img_dataset, age_dataset))
 

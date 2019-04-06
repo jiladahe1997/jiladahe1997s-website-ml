@@ -52,14 +52,39 @@ model.summary()
   # todo 保存模型，修改steps_per_epoch
   # todo 增加可视化
 '''
-model.fit(ds, epochs=100, steps_per_epoch=20)
+import pandas as pd
+import matplotlib.pyplot as plt
+
+history = model.fit(ds, epochs=20, steps_per_epoch=150)
+model.save('my_model.h5')
+# hist = pd.DataFrame(history.history)
+# hist['epoch'] = history.epoch
+# hist.tail()
+def plot_history(history):
+  hist = pd.DataFrame(history.history)
+  hist['epoch'] = history.epoch
+  
+  plt.figure()
+  plt.xlabel('Epoch')
+  plt.ylabel('Mean Abs Error [MPG]')
+  plt.plot(hist['epoch'], hist['mean_absolute_error'],
+           label='Train Error')
+  plt.ylim([0,100])
+  plt.legend()
+  
+  plt.show()
+
+
+plot_history(history)
+
 a=0
 
 '''
   # * 第五步：作出预测
 '''
 import numpy as np
-prediction = model.evaluate_generator(ds_test, steps=3)
+prediction = model.predict_generator(ds_test, steps=3)
+evaluate = model.evaluate_generator(ds_test, steps=3)
 np.argmax(prediction[0])
 
 a=[]
