@@ -15,10 +15,7 @@ tf.enable_eager_execution()
 # image_root = [str(i) for i in image_root]
 
 root = os.getcwd()
-# root00 = root+'\\wiki_crop\\00'
 root = root+'\\wiki_crop\\'
-
-
 img_path = []
 for root, dirs, files in os.walk(root):
   for directory in dirs:
@@ -26,7 +23,7 @@ for root, dirs, files in os.walk(root):
     for files_name in os.walk(directory):
       for file_name in files_name[2]:
         img_path.append(directory+file_name)
-img_path = img_path[:2400]
+img_path = img_path[:1200]
 # for i in range(99):
 #   if i<10:
 #     root_directory = root+'0'+str(i)
@@ -95,19 +92,27 @@ for age in mat.age:
     print('debug!')
 age_dataset=[]
 img_dataset=[]
+i=0
 for file_path in img_path:
+    print(i)
     file_path_sliced = file_path[51:]
     for age in mat.age:
         if age.get('filename') == file_path_sliced:
+          # 排除负数数据
+          if age.get('age') < 0:
+            break
+          else:
             age_dataset.append(int(age.get('age')))
             img_dataset.append(decode_img(file_path))
+            break
+    i +=1 
 
-age_dataset_test = []
-for file_path in img_path_test:
-    file_path_sliced = file_path[51:]
-    for age in mat.age_test:
-        if age.get('filename') == file_path_sliced:
-            age_dataset_test.append(int(age.get('age')))
+# age_dataset_test = []
+# for file_path in img_path_test:
+#     file_path_sliced = file_path[51:]
+#     for age in mat.age_test:
+#         if age.get('filename') == file_path_sliced:
+#             age_dataset_test.append(int(age.get('age')))
 
 # 检查一下数据顺序是否正确
 # for age in mat.age:
@@ -127,8 +132,8 @@ print("标签数:",len(age_dataset))
 age_dataset = tf.data.Dataset.from_tensor_slices(age_dataset)
 image_label_ds = tf.data.Dataset.zip((img_dataset, age_dataset))
 
-img_tensors_test = img_tensors_test[:100]
-img_dataset_test = tf.data.Dataset.from_tensor_slices(img_tensors_test)
-age_dataset_test = age_dataset_test[:100]
-age_dataset_test = tf.data.Dataset.from_tensor_slices(age_dataset_test)
-image_label_ds_test = tf.data.Dataset.zip((img_dataset_test, age_dataset_test))
+# img_tensors_test = img_tensors_test[:100]
+# img_dataset_test = tf.data.Dataset.from_tensor_slices(img_tensors_test)
+# age_dataset_test = age_dataset_test[:100]
+# age_dataset_test = tf.data.Dataset.from_tensor_slices(age_dataset_test)
+# image_label_ds_test = tf.data.Dataset.zip((img_dataset_test, age_dataset_test))

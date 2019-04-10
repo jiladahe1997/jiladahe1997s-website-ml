@@ -1,5 +1,5 @@
 from main_eager import image_label_ds as ds
-from main_eager import image_label_ds_test as ds_test
+# from main_eager import image_label_ds_test as ds_test
 
 import tensorflow as tf
 
@@ -12,10 +12,10 @@ ds = ds.apply(
 ds = ds.batch(20)
 ds = ds.prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
 
-ds_test = ds_test.apply(
-  tf.data.experimental.shuffle_and_repeat(buffer_size=600))
-ds_test = ds_test.batch(32)
-ds_test = ds_test.prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
+# ds_test = ds_test.apply(
+#   tf.data.experimental.shuffle_and_repeat(buffer_size=600))
+# ds_test = ds_test.batch(18)
+# ds_test = ds_test.prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
 
 '''
   # * 第二步：数据[0-1]转换到[-1,1]
@@ -24,7 +24,7 @@ ds_test = ds_test.prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
 def change_range(image,label):
   return 2*image-1, label
 
-ds = ds.map(change_range)
+# ds = ds.map(change_range)
 image_batch, label_batch = next(iter(ds))
 # ds = tf.keras.applications.vgg19.preprocess_input(image_batch)
 vgg19 = tf.keras.applications.VGG19(include_top=False, input_shape=(192, 192, 3), weights='imagenet')
@@ -42,7 +42,7 @@ model = tf.keras.Sequential([
     tf.keras.layers.Dense(100)
 ])
 model.compile(optimizer=tf.train.AdamOptimizer(), 
-              loss="mean_absolute_error",
+              loss="sparse_categorical_crossentropy",
               metrics=["mean_absolute_error"])
 model.summary()
 
@@ -55,7 +55,7 @@ model.summary()
 import pandas as pd
 import matplotlib.pyplot as plt
 
-history = model.fit(ds, epochs=20, steps_per_epoch=150)
+history = model.fit(ds, epochs=20, steps_per_epoch=100)
 model.save('my_model.h5')
 # hist = pd.DataFrame(history.history)
 # hist['epoch'] = history.epoch
@@ -82,9 +82,9 @@ a=0
 '''
   # * 第五步：作出预测
 '''
-import numpy as np
-prediction = model.predict_generator(ds_test, steps=3)
-evaluate = model.evaluate_generator(ds_test, steps=3)
-np.argmax(prediction[0])
+# import numpy as np
+# prediction = model.predict_generator(ds_test, steps=3)
+# evaluate = model.evaluate_generator(ds_test, steps=3)
+# np.argmax(prediction[0])
 
 a=[]
