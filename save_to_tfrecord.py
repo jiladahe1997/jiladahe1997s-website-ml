@@ -87,7 +87,7 @@ import matplotlib.pyplot as plt
 import mat
 # 组合img_dataset和mat
 # 1.根据img_path重新排mat中age顺序
-def save_to_record_file(file_path, age):
+def save_to_record_file(file_path, age, writer):
   # img_raw = tf.read_file(file_path)
   img_raw = open(file_path, 'rb').read()
   img_tensor = tf.io.decode_image(img_raw, channels=3)
@@ -108,11 +108,13 @@ for age in mat.age:
   if(age.get('filename') == '7721992_1947-10-06_1964.jpg'):
     print('debug!')
   
-filename = 'pic_age_dataset_test.tfrecord'
-writer = tf.python_io.TFRecordWriter(filename)
+filename = 'pic_age_dataset_test_'
+back = '.tfrecord'
 age_dataset=[]
 img_dataset=[]
 i=0
+number=3 
+writer = tf.python_io.TFRecordWriter(filename+str(number)+back)
 for file_path in img_path:
     print(i)
     file_path_sliced = file_path[51:]
@@ -121,13 +123,20 @@ for file_path in img_path:
           # 排除负数数据
           if age.get('age') < 0:
             break
-          else:
+          else: 
+            if len(age_dataset)==600:
+              writer.close()
+              age_dataset=[]
+              number+=1
+              writer = tf.python_io.TFRecordWriter(filename+str(number)+back)
+              
             age_dataset.append(int(age.get('age')))
-            img_dataset.append(decode_img(file_path))
+            # img_dataset.append(decode_img(file_path))
             # 在这里存成tfrecord file
-            save_to_record_file(file_path, int(age.get('age')))
+            save_to_record_file(file_path, int(age.get('age')), writer)
             break
-    i +=1 
+    i +=1
+    
 
 # age_dataset_test = []
 # for file_path in img_path_test:

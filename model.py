@@ -22,14 +22,20 @@ ds = ds.prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
   # ? why？ 为什么要转换？教程说是mobilenet要求的，但是这里vgg19也要？
 '''
 def change_range(image,label):
-  return 2*image-1, label
+  return image/255.0, label
 
-# ds = ds.map(change_range)
+ds = ds.map(change_range)
 image_batch, label_batch = next(iter(ds))
 # ds = tf.keras.applications.vgg19.preprocess_input(image_batch)
 vgg19 = tf.keras.applications.VGG19(include_top=False, input_shape=(192, 192, 3), weights='imagenet')
 
-
+def loss_func(predict_y, desired_y):
+  def process(y):
+    for index, p in enumerate(predict_y):
+      predict_y[index] = p*index
+    return 
+  predict_y = predict_y.map(process)
+  return tf.reduce_mean(tf.square(predict_y - desired_y))
 '''
   # * 第三步：建立sequential序列模型
   # ? 这里的输出层是Dense?
@@ -39,10 +45,11 @@ vgg19 = tf.keras.applications.VGG19(include_top=False, input_shape=(192, 192, 3)
 model = tf.keras.Sequential([
     vgg19,
     tf.keras.layers.GlobalAveragePooling2D(),
-    tf.keras.layers.Dense(100)
+    tf.keras.layers.Dense(100),
+    tf.keras.layers.Softmax()
 ])
 model.compile(optimizer=tf.train.AdamOptimizer(), 
-              loss="sparse_categorical_crossentropy",
+              loss='mean_absolute_error',
               metrics=["mean_absolute_error"])
 model.summary()
 

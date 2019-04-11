@@ -5,3 +5,4 @@ __pycache__/
 *.mat
 pandas/
 *.h5
+*.tfrecord
