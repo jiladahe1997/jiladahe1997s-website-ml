@@ -23,7 +23,7 @@ for root, dirs, files in os.walk(root):
     for files_name in os.walk(directory):
       for file_name in files_name[2]:
         img_path.append(directory+file_name)
-img_path = img_path[1800:6000]
+img_path = img_path[10000:10600]
 # for i in range(99):
 #   if i<10:
 #     root_directory = root+'0'+str(i)
