@@ -1,6 +1,6 @@
 import tensorflow as tf
 
-raw_image_dataset = tf.data.TFRecordDataset('pic_age_dataset_test.tfrecord')
+raw_image_dataset = tf.data.TFRecordDataset('pic_age_dataset.tfrecord')
 
 def _parse_image_function(example_proto):
   image_feature_description = {
@@ -20,8 +20,6 @@ def _parse_image_function(example_proto):
 
 
 
-
-
 parsed_image_dataset = raw_image_dataset.map(_parse_image_function)
 ds = parsed_image_dataset.apply(tf.data.experimental.shuffle_and_repeat(buffer_size=600))
 ds = ds.batch(20)
@@ -30,11 +28,19 @@ ds = ds.prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
 
 
 
+vgg19 = tf.keras.applications.VGG19(include_top=False, input_shape=(192, 192, 3), weights='imagenet')
+model = tf.keras.Sequential([
+    vgg19,
+    tf.keras.layers.GlobalAveragePooling2D(),
+    tf.keras.layers.Dense(1),
+])
 
-model = tf.keras.models.load_model('my_model.h5')
 model.compile(optimizer=tf.train.AdamOptimizer(), 
               loss="mean_absolute_error",
               metrics=["mean_absolute_error"])
 model.summary()
-model.evaluate(ds , steps=30)
+history = model.fit(ds , epochs=20, steps_per_epoch=30)
+model.save('my_model.h5')
+
+
 

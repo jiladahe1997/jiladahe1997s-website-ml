@@ -7,10 +7,6 @@
 
 其原理是基于机器学习（machine learning），具体原理请见本文最后 - 原理介绍
 
-文件比较乱：待整理。<br/>
-数据处理: mat.py、main_eager.py、save_to_tfrecord.py <br/>
-训练模型：model_from_tfrecord.py <br/>
-
 如果你也想训练自己的神经网络，或者也想学习机器学习，教程推荐：[todo]
 
 
@@ -34,6 +30,43 @@
 3.web框架使用的是django
 
 4.训练使用的google colab
+
+
+# 使用本项目
+
+0.首先使用pip install 安装几个包(吐槽一下，python没有类似于前端的package.json之类的文件直接记录依赖包关系吗):tensorflow、scipy(用于读取mat文件)、django（用于搭建http服务器） 
+
+1.首先由于数据集太大，肯定不能放在gtihub上面，去上面的链接下也会很慢，我专门将其上传到微云给大家下载。由于IMDB-WIKI一共有两部分数据 IMDB和WIKI部分，我的论文仅研究使用，故只下载并上传了较小的wiki部分（700MB左右）
+
+2.下载好后应该把 **wiki_crop**(图片) 和 **wiki.mat**（图片信息） 两个文件应该如图放置
+
+│  README.md　　　　　　　　　<br>
+│  save_to_tfrecord.py　　　　　　　　　<br>
+│  tfrecord_eval　　　<br>
+│  ............　　　　　　<br>
+│  **wiki_crop**　　　<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│ 00     <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│   23300_1962-06-19_2011.jpg   <br>
+|  **wiki.mat**　　　<br>
+　　　　　　　　　
+
+3.然后就是你的表演时间了，主要是四个文件，这里只做简单的介绍，代码注释很完善，欢迎阅读指正， 
+
+· *config.py*文件：主要是配置，包括了需要读取多少个文件，生成的文件名等信息。
+
+· *svae_to_tfrecord.py*文件（间接引用mat.py文件）：用于将图片数据和年龄数据处理到一起。并保存为tfrecord文件，因为歪果仁之前做的是图片和分离的mat文件，两者之间通过文件名进行关联。
+
+· *tfrecord_train.py*文件：用于读取tfrecord文件，并构建一个vgg19神经网络架构，然后进行训练。
+
+· *tfrecord_eval.py*文件：用于评估训练好的模型误差。不用太关注这个文件。
+
+*4.如果你不需要http服务器，不需要看这之后的步骤了<br>
+以上步骤就可以训练好一个模型model了，接下来是搭建一个简单的django http服务器：<br>
+./jiladahe1997_website_ml 目录下是django文件目录，所有目录结构都是django初始化生成的，所以你问我我也不知道干什么的。除了在urls.py中加一个路由，以及新建一个view.py中并且写一个控制器。
+
+因此你只需要看一下view.py中的代码即可。
+
+直接运行python ./jiladahe1997_website_ml/manage.py runserver 即可。
 
 # 使用示例
 
